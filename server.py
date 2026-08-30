@@ -1,5 +1,5 @@
 # xiaoyan-heartbeat —— 小妍的心跳（MCP 版）
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import os
 from fastmcp import FastMCP
 from starlette.requests import Request
@@ -7,6 +7,7 @@ from starlette.responses import JSONResponse
 
 mcp = FastMCP("xiaoyan-heartbeat")
 recent = []
+CN_TZ = timezone(timedelta(hours=8))  # 北京时间（东八区）
 
 @mcp.tool
 def get_heartbeat() -> dict:
@@ -19,7 +20,7 @@ def get_heartbeat() -> dict:
 async def report(request: Request) -> JSONResponse:
     body = await request.json()
     entry = {
-        "time": datetime.now().isoformat(),
+        "time": datetime.now(CN_TZ).isoformat(),
         "battery": body.get("battery"),
         "steps": body.get("steps"),
         "city": body.get("city", ""),
